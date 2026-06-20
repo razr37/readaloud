@@ -21,7 +21,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tabs{display:flex;gap:3px;margin-left:10px}
 .tab{font-size:12px;padding:5px 13px;border-radius:20px;border:none;cursor:pointer;background:transparent;color:var(--ts);font-family:inherit;transition:all .15s}
 .tab.on{background:var(--g);color:#fff}
-.sync-pill{margin-left:auto;font-size:10px;padding:3px 10px;border-radius:20px;white-space:nowrap}
+.sync-pill{margin-left:auto;font-size:10px;padding:3px 10px;border-radius:20px;white-space:nowrap;border:none;font-family:inherit;cursor:pointer}
 .sync-pill.ok{background:var(--gl);color:var(--gd)}
 .sync-pill.grey{background:#f0f0ec;color:var(--ts)}
 
@@ -148,7 +148,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <button class="tab on" id="tLib" onclick="sv('library')">Library</button>
       <button class="tab" id="tPlayer" onclick="sv('player')">Player</button>
     </div>
-    <span class="sync-pill grey" id="pill">⟳ Loading</span>
+    <button class="sync-pill grey" id="pill" onclick="loadLibrary()">⟳ Loading</button>
   </div>
 
   <!-- LIBRARY -->
@@ -853,6 +853,8 @@ function closeModal() { document.getElementById('modal').classList.remove('on');
 
 // Boot
 loadLibrary();
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') loadLibrary(); });
+window.addEventListener('pageshow', e => { if (e.persisted) loadLibrary(); });
 </script>
 </body>
 </html>
