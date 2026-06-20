@@ -113,6 +113,132 @@ test('POST /api/library rejects non-array', async () => {
   expect(res.body.error).toBeDefined();
 });
 
+// ── /api/search-text ──────────────────────────────────────────────────────────
+test('GET /api/search-text requires q param', async () => {
+  const res = await request(app).get('/api/search-text');
+  expect(res.status).toBe(400);
+  expect(res.body.error).toBeDefined();
+});
+
+test('GET /api/search-text returns Gutenberg results', async () => {
+  mock.onGet('https://gutendex.com/books/').reply(200, {
+    results: [
+      {
+        title: 'Frankenstein',
+        authors: [{ name: 'Shelley, Mary' }],
+        formats: { 'text/plain; charset=utf-8': 'https://www.gutenberg.org/files/84/84-0.txt' },
+      },
+    ],
+  });
+  mock.onGet('https://standardebooks.org/ebooks').reply(200, '<html><body></body></html>');
+  mock.onGet('https://archive.org/advancedsearch.php').reply(200, { response: { docs: [] } });
+
+  const res = await request(app).get('/api/search-text?q=frankenstein');
+  expect(res.status).toBe(200);
+  expect(res.body.results.length).toBeGreaterThan(0);
+  expect(res.body.results[0].title).toBe('Frankenstein');
+  expect(res.body.results[0].origin).toBe('Project Gutenberg');
+  expect(res.body.results[0].url).toContain('gutenberg.org');
+  expect(res.body.results[0].format).toBe('txt');
+});
+
+test('GET /api/search-text returns Archive.org results', async () => {
+  mock.onGet('https://gutendex.com/books/').reply(200, { results: [] });
+  mock.onGet('https://standardebooks.org/ebooks').reply(200, '<html><body></body></html>');
+  mock.onGet('https://archive.org/advancedsearch.php').reply(200, {
+    response: {
+      docs: [
+        { identifier: 'warandpeace', title: 'War and Peace', creator: 'Tolstoy, Leo' },
+      ],
+    },
+  });
+
+  const res = await request(app).get('/api/search-text?q=war+and+peace');
+  expect(res.status).toBe(200);
+  expect(res.body.results.length).toBeGreaterThan(0);
+  const arc = res.body.results.find(r => r.origin === 'Internet Archive');
+  expect(arc).toBeDefined();
+  expect(arc.url).toContain('warandpeace');
+});
+
+test('GET /api/search-text returns empty results when all sources fail', async () => {
+  mock.onGet('https://gutendex.com/books/').networkError();
+  mock.onGet('https://standardebooks.org/ebooks').networkError();
+  mock.onGet('https://archive.org/advancedsearch.php').networkError();
+
+  const res = await request(app).get('/api/search-text?q=zzz_test');
+  expect(res.status).toBe(200);
+  expect(res.body.results).toHaveLength(0);
+});
+
+test('GET /api/search-text strips Gutenberg books without plain text URL', async () => {
+  mock.onGet('https://gutendex.com/books/').reply(200, {
+    results: [
+      {
+        title: 'No Text Book',
+        authors: [{ name: 'Author, Unknown' }],
+        formats: { 'application/epub+zip': 'https://gutenberg.org/epub/123/book.epub' },
+      },
+    ],
+  });
+  mock.onGet('https://standardebooks.org/ebooks').reply(200, '<html><body></body></html>');
+  mock.onGet('https://archive.org/advancedsearch.php').reply(200, { response: { docs: [] } });
+
+  const res = await request(app).get('/api/search-text?q=no+text');
+  expect(res.status).toBe(200);
+  expect(res.body.results.filter(r => r.origin === 'Project Gutenberg')).toHaveLength(0);
+});
+
+// ── /api/fetch-text ───────────────────────────────────────────────────────────
+test('POST /api/fetch-text requires url', async () => {
+  const res = await request(app).post('/api/fetch-text').send({});
+  expect(res.status).toBe(400);
+  expect(res.body.error).toBeDefined();
+});
+
+test('POST /api/fetch-text fetches and returns plain text', async () => {
+  const sampleText = 'Call me Ishmael. Some years ago never mind how long precisely.';
+  mock.onGet('https://www.gutenberg.org/files/2701/2701-0.txt').reply(200, sampleText, { 'content-type': 'text/plain' });
+
+  const res = await request(app)
+    .post('/api/fetch-text')
+    .send({ url: 'https://www.gutenberg.org/files/2701/2701-0.txt', format: 'txt' });
+  expect(res.status).toBe(200);
+  expect(res.body.text).toBeDefined();
+  expect(res.body.wordCount).toBeGreaterThan(0);
+});
+
+test('POST /api/fetch-text strips Gutenberg header/footer markers', async () => {
+  const raw = 'Some preamble\n*** START OF THE PROJECT GUTENBERG EBOOK\nActual book text here.\n*** END OF THE PROJECT GUTENBERG EBOOK\nSome footer';
+  mock.onGet('https://www.gutenberg.org/test.txt').reply(200, raw, { 'content-type': 'text/plain' });
+
+  const res = await request(app)
+    .post('/api/fetch-text')
+    .send({ url: 'https://www.gutenberg.org/test.txt', format: 'txt' });
+  expect(res.status).toBe(200);
+  expect(res.body.text).toContain('Actual book text here.');
+  expect(res.body.text).not.toContain('Some preamble');
+  expect(res.body.text).not.toContain('Some footer');
+});
+
+// ── /api/extract-upload ───────────────────────────────────────────────────────
+test('POST /api/extract-upload requires a file', async () => {
+  const res = await request(app).post('/api/extract-upload');
+  expect(res.status).toBe(400);
+  expect(res.body.error).toBeDefined();
+});
+
+test('POST /api/extract-upload handles a plain txt file', async () => {
+  const text = 'To be or not to be that is the question whether tis nobler in the mind to suffer.';
+  const res = await request(app)
+    .post('/api/extract-upload')
+    .attach('file', Buffer.from(text), { filename: 'hamlet.txt', contentType: 'text/plain' });
+  expect(res.status).toBe(200);
+  expect(res.body.text).toBe(text);
+  expect(res.body.wordCount).toBeGreaterThan(0);
+  expect(res.body.suggestedTitle).toBe('hamlet');
+});
+
 // ── fallback ──────────────────────────────────────────────────────────────────
 test('unknown route serves index.html', async () => {
   const res = await request(app).get('/some/random/path');

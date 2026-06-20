@@ -37,6 +37,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .card{border:0.5px solid var(--b);border-radius:13px;overflow:hidden;background:var(--card);cursor:pointer;transition:transform .1s}
 .card:active{transform:scale(.97)}
 .cover{height:95px;display:flex;align-items:center;justify-content:center;font-size:38px;position:relative}
+.stag{position:absolute;top:6px;left:6px;font-size:11px;line-height:1;padding:2px 5px;border-radius:5px;background:rgba(0,0,0,.35);color:#fff}
 .cpb{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(0,0,0,.07)}
 .cpf{height:100%;background:var(--g)}
 .cinfo{padding:9px 10px 4px}
@@ -52,20 +53,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .empty-sub{font-size:13px;color:var(--ts);line-height:1.7}
 .empty-tip{background:var(--gl);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--gd);line-height:1.7;text-align:left;max-width:300px}
 
-/* ── Player ── */
+/* ── Player — shared ── */
 .phead{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:0.5px solid var(--b);background:var(--card);flex-shrink:0}
 .pbk{font-size:13px;color:var(--ts);border:none;background:transparent;cursor:pointer;padding:4px 9px;border-radius:8px;font-family:inherit}
 .ptit{font-size:14px;font-weight:600;flex:1;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .pch{font-size:12px;color:var(--tt);white-space:nowrap}
-.chapters{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
-.chitem{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:0.5px solid var(--b);cursor:pointer;transition:background .1s}
-.chitem:active{background:var(--bg)}
-.chitem.active{background:var(--gl)}
-.chnum{font-size:11px;color:var(--tt);min-width:28px;text-align:right;flex-shrink:0}
-.chtit{flex:1;font-size:14px;line-height:1.35}
-.chitem.active .chtit{color:var(--gd);font-weight:600}
-.chdur{font-size:11px;color:var(--tt);flex-shrink:0}
-.chplay{font-size:12px;color:var(--g);flex-shrink:0;width:18px;text-align:center}
+.no-book{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--ts);font-size:14px}
+.player-section{display:none;flex:1;flex-direction:column;overflow:hidden}
+.player-section.on{display:flex}
 .playbar{display:flex;flex-direction:column;gap:10px;padding:12px 16px 20px;border-top:0.5px solid var(--b);background:var(--card);flex-shrink:0}
 .pbrow1{display:flex;align-items:center;gap:8px}
 .seek{flex:1;height:4px;background:var(--bg);border-radius:2px;cursor:pointer;border:0.5px solid var(--b)}
@@ -77,7 +72,29 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .skipbtn{width:38px;height:38px;border-radius:50%;border:0.5px solid var(--b);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px}
 .skipbtn:disabled{opacity:.3;pointer-events:none}
 .spdbtn{padding:5px 10px;border:0.5px solid var(--b);border-radius:20px;background:transparent;cursor:pointer;font-size:12px;font-family:inherit;color:var(--ts)}
-.no-book{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;gap:10px;color:var(--ts);font-size:14px}
+
+/* ── Audio player ── */
+.chapters{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.chitem{display:flex;align-items:center;gap:12px;padding:13px 16px;border-bottom:0.5px solid var(--b);cursor:pointer;transition:background .1s}
+.chitem:active{background:var(--bg)}
+.chitem.active{background:var(--gl)}
+.chnum{font-size:11px;color:var(--tt);min-width:28px;text-align:right;flex-shrink:0}
+.chtit{flex:1;font-size:14px;line-height:1.35}
+.chitem.active .chtit{color:var(--gd);font-weight:600}
+.chdur{font-size:11px;color:var(--tt);flex-shrink:0}
+.chplay{font-size:12px;color:var(--g);flex-shrink:0;width:18px;text-align:center}
+
+/* ── TTS reader ── */
+.rctrl{display:flex;align-items:center;gap:11px;padding:8px 14px;border-bottom:0.5px solid var(--b);flex-wrap:wrap;background:var(--card);flex-shrink:0}
+.clbl{font-size:11px;color:var(--tt)}
+.cg{display:flex;align-items:center;gap:5px}
+.cg select{font-size:12px;border-radius:7px;border:0.5px solid var(--b);background:var(--bg);color:var(--t);padding:3px 6px;font-family:inherit;max-width:150px}
+.cg input[type=range]{width:72px;accent-color:var(--g)}
+.sv{font-size:12px;font-weight:600;min-width:32px}
+.td{overflow-y:auto;-webkit-overflow-scrolling:touch;padding:20px 18px;line-height:2;font-size:17px;flex:1}
+.word{cursor:pointer;border-radius:3px;padding:0 1px;transition:background .08s}
+.word.active{background:#9FE1CB;color:#04342C}
+.word.spoken{color:var(--tt)}
 
 /* ── Bottom sheet modal ── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;align-items:flex-end;justify-content:center}
@@ -103,10 +120,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .rcheck{font-size:15px;color:var(--g);flex-shrink:0;opacity:0;margin-top:2px}
 .ritem.sel .rcheck{opacity:1}
 .fbox{background:var(--gl);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--gd);text-align:center;line-height:1.7}
+.src-attr{font-size:11px;color:var(--tt);text-align:center;padding-top:2px}
 .sfoot{display:flex;justify-content:space-between;align-items:center;padding:12px 18px 24px;border-top:0.5px solid var(--b);flex-shrink:0}
 .ccbtn{padding:11px 15px;border:0.5px solid var(--b);background:transparent;border-radius:10px;font-size:14px;cursor:pointer;color:var(--ts);font-family:inherit}
 .addbtn{padding:11px 20px;background:var(--g);color:#fff;border:none;border-radius:10px;font-size:14px;cursor:pointer;font-family:inherit;font-weight:600}
 .addbtn:disabled{background:var(--tt)}
+
+/* ── Upload zone ── */
+.upload-head{font-size:14px;font-weight:600;color:var(--t)}
+.upload-body{font-size:12px;color:var(--ts);line-height:1.5;margin-top:2px}
+.drop-zone{border:2px dashed var(--b);border-radius:12px;padding:24px 20px;text-align:center;cursor:pointer;margin-top:6px;transition:border-color .15s,background .15s}
+.drop-zone:hover,.drop-zone.dragover{border-color:var(--g);background:var(--gl)}
+.uicon{font-size:32px;margin-bottom:6px}
+.ulabel{font-size:14px;font-weight:600;color:var(--t)}
+.usub{font-size:12px;color:var(--ts);margin-top:3px}
+.ufmt{font-size:11px;color:var(--tt);margin-top:8px;letter-spacing:.5px}
 
 @keyframes spin{to{transform:rotate(360deg)}}
 .spin{display:inline-block;animation:spin .7s linear infinite}
@@ -127,7 +155,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="view on" id="vLib">
     <div class="lhead">
       <div class="ltitle">My Library</div>
-      <button class="find-btn" onclick="openModal()">＋ Find book</button>
+      <button class="find-btn" onclick="openModal()">＋ Find a book</button>
     </div>
     <div class="grid" id="grid"></div>
   </div>
@@ -139,25 +167,47 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
       <div class="ptit" id="ptit">—</div>
       <span class="pch" id="pch"></span>
     </div>
+
     <div id="noBook" class="no-book" style="display:none">
       <span style="font-size:36px">🎧</span>
       <span>Open a book from the Library</span>
     </div>
-    <div class="chapters" id="chapters"></div>
-    <div class="playbar" id="playbar">
-      <div class="pbrow1">
-        <span class="ttime" id="curtime">0:00</span>
-        <div class="seek" onclick="seekClick(event)">
-          <div class="seekf" id="seekf" style="width:0%"></div>
+
+    <!-- LibriVox audio mode -->
+    <div id="audioView" class="player-section">
+      <div class="chapters" id="chapters"></div>
+      <div class="playbar">
+        <div class="pbrow1">
+          <span class="ttime" id="curtime">0:00</span>
+          <div class="seek" onclick="seekClick(event)">
+            <div class="seekf" id="seekf" style="width:0%"></div>
+          </div>
+          <span class="ttime" id="tottime">0:00</span>
         </div>
-        <span class="ttime" id="tottime">0:00</span>
+        <div class="pbrow2">
+          <button class="spdbtn" id="spdbtn" onclick="cycleAudioSpeed()">1×</button>
+          <button class="skipbtn" id="prevBtn" onclick="prevChapter()" disabled>⏮</button>
+          <button class="playbtn" onclick="togglePlay()"><span id="pico">▶️</span></button>
+          <button class="skipbtn" id="nextBtn" onclick="nextChapter()" disabled>⏭</button>
+          <button class="skipbtn" onclick="skip(-30)" style="font-size:13px">↺<span style="font-size:9px">30</span></button>
+        </div>
       </div>
-      <div class="pbrow2">
-        <button class="spdbtn" id="spdbtn" onclick="cycleSpeed()">1×</button>
-        <button class="skipbtn" id="prevBtn" onclick="prevChapter()" disabled>⏮</button>
-        <button class="playbtn" id="plBtn" onclick="togglePlay()"><span id="pico">▶️</span></button>
-        <button class="skipbtn" id="nextBtn" onclick="nextChapter()" disabled>⏭</button>
-        <button class="skipbtn" onclick="skip(-30)" title="Back 30s" style="font-size:13px">↺<span style="font-size:9px">30</span></button>
+    </div>
+
+    <!-- TTS text mode -->
+    <div id="ttsView" class="player-section">
+      <div class="rctrl">
+        <div class="cg"><span class="clbl">Voice</span><select id="vsel" onchange="onTtsVoice()"></select></div>
+        <div class="cg"><span class="clbl">Speed</span><input type="range" id="ttsSpd" min="0.5" max="3" step="0.1" value="1" oninput="onTtsSpd()"><span class="sv" id="ttsSpdV">1.0×</span></div>
+        <div class="cg"><span class="clbl">Font</span><input type="range" id="fnt" min="13" max="26" step="1" value="17" oninput="document.getElementById('td').style.fontSize=this.value+'px'"></div>
+      </div>
+      <div class="td" id="td"></div>
+      <div class="playbar">
+        <div class="pbrow2">
+          <button class="skipbtn" onclick="ttsSkip(-50)" title="Back 50 words">⏮</button>
+          <button class="playbtn" onclick="toggleTts()"><span id="ttsIco">▶️</span></button>
+          <button class="skipbtn" onclick="ttsSkip(50)" title="Forward 50 words">⏭</button>
+        </div>
       </div>
     </div>
   </div>
@@ -168,16 +218,30 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="sheet">
     <div class="handle"></div>
     <div class="sbody">
-      <div class="sh">Find an audiobook</div>
-      <div class="ssub">Search LibriVox by <strong>author name</strong> (e.g. "Austen", "Dickens") or exact book title</div>
+      <div class="sh">Find a book</div>
+      <div class="ssub">Type a title or author. We'll find the best version automatically.</div>
       <div class="qrow">
-        <input class="qi" id="qi" placeholder="Author name (e.g. Austen, Dickens)…" onkeydown="if(event.key==='Enter')doSearch()">
+        <input class="qi" id="qi" placeholder="Title or author…" onkeydown="if(event.key==='Enter')doSearch()">
         <button class="gobtn" id="goBtn" onclick="doSearch()">Search</button>
       </div>
       <div class="astat" id="astat"></div>
       <div id="rlist"></div>
-      <div class="fbox" id="fbox" style="display:none">
-        <span class="spin">⟳</span> Loading chapter list…
+      <div class="src-attr" id="srcAttr" style="display:none">From Project Gutenberg, Standard Ebooks, or the Internet Archive — public domain only.</div>
+      <div class="fbox" id="fbox" style="display:none"></div>
+      <div id="uploadZone" style="display:none">
+        <div class="upload-head">Have your own copy?</div>
+        <div class="upload-body">Upload the file and we'll read it aloud — your file, your book, nothing leaves your library.</div>
+        <div class="drop-zone"
+             onclick="document.getElementById('fileInput').click()"
+             ondragover="event.preventDefault();this.classList.add('dragover')"
+             ondragleave="this.classList.remove('dragover')"
+             ondrop="event.preventDefault();this.classList.remove('dragover');if(event.dataTransfer.files[0])handleUpload(event.dataTransfer.files[0])">
+          <div class="uicon">📁</div>
+          <div class="ulabel">Drop a PDF, EPUB, or text file here</div>
+          <div class="usub">or tap to browse</div>
+          <div class="ufmt">PDF · EPUB · TXT</div>
+          <input type="file" id="fileInput" accept=".pdf,.epub,.txt" style="display:none" onchange="handleUpload(this.files[0])">
+        </div>
       </div>
     </div>
     <div class="sfoot">
@@ -203,24 +267,27 @@ function fmtTime(secs) {
 
 function parseDuration(str) {
   if (!str) return 0;
-  if (!isNaN(str)) return parseInt(str, 10); // LibriVox returns seconds as string
+  if (!isNaN(str)) return parseInt(str, 10);
   const p = str.split(':').map(Number);
   return p.length === 3 ? p[0]*3600+p[1]*60+p[2] : p.length === 2 ? p[0]*60+p[1] : 0;
 }
 
-let library = [], curBook = null, curChapter = 0, selResult = null, saveTimer = null;
+// ── State ─────────────────────────────────────────────────────────────────────
+let library = [], curBook = null, curChapter = 0, selResult = null, audioSaveTimer = null;
 const SPEEDS = [0.75, 1, 1.25, 1.5, 1.75, 2];
 let speedIdx = 1;
 const audio = new Audio();
 audio.preload = 'metadata';
+
+const synth = window.speechSynthesis;
+let ttsWords = [], ttsWordEls = [], ttsCidx = 0, ttsPlaying = false, ttsVoices = [], ttsSaveTimer = null;
 
 // ── Audio events ──────────────────────────────────────────────────────────────
 audio.addEventListener('timeupdate', () => {
   const d = audio.duration || 0, t = audio.currentTime;
   document.getElementById('curtime').textContent = fmtTime(t);
   document.getElementById('seekf').style.width = d ? (t/d*100)+'%' : '0%';
-  // debounced save every 15s
-  if (!saveTimer) saveTimer = setTimeout(() => { persistProgress(); saveTimer = null; }, 15000);
+  if (!audioSaveTimer) audioSaveTimer = setTimeout(() => { persistAudioProgress(); audioSaveTimer = null; }, 15000);
 });
 audio.addEventListener('loadedmetadata', () => {
   document.getElementById('tottime').textContent = fmtTime(audio.duration);
@@ -231,7 +298,7 @@ audio.addEventListener('ended', () => {
   else document.getElementById('pico').textContent = '▶️';
 });
 audio.addEventListener('play', () => document.getElementById('pico').textContent = '⏸️');
-audio.addEventListener('pause', () => { document.getElementById('pico').textContent = '▶️'; persistProgress(); });
+audio.addEventListener('pause', () => { document.getElementById('pico').textContent = '▶️'; persistAudioProgress(); });
 audio.addEventListener('error', () => document.getElementById('pico').textContent = '▶️');
 
 // ── Sync pill ─────────────────────────────────────────────────────────────────
@@ -262,51 +329,103 @@ async function saveLibraryRemote() {
   }
 }
 
-function persistProgress() {
-  if (!curBook) return;
+function persistAudioProgress() {
+  if (!curBook || (curBook.source && curBook.source !== 'librivox')) return;
   const b = library.find(x => x.id === curBook.id);
-  if (b) { b.currentChapter = curChapter; b.currentTime = Math.floor(audio.currentTime); }
+  if (b) {
+    b.progress = b.progress || {};
+    b.progress.chapterIdx = curChapter;
+    b.progress.time = Math.floor(audio.currentTime);
+    b.currentChapter = curChapter;
+    b.currentTime = Math.floor(audio.currentTime);
+  }
   saveLibraryRemote();
 }
 
-// ── Search ────────────────────────────────────────────────────────────────────
+// ── Search cascade ────────────────────────────────────────────────────────────
+function setStatus(html) { document.getElementById('astat').innerHTML = html; }
+function setFbox(msg) {
+  const fb = document.getElementById('fbox');
+  fb.innerHTML = `<span class="spin">⟳</span> ${esc(msg)}`;
+  fb.style.display = 'block';
+}
+function hideFbox() { document.getElementById('fbox').style.display = 'none'; }
+
 async function doSearch() {
   const q = document.getElementById('qi').value.trim();
   if (!q) return;
   document.getElementById('goBtn').disabled = true;
-  document.getElementById('astat').innerHTML = '<span class="spin">⟳</span> Searching LibriVox…';
+  setStatus('<span class="spin">⟳</span> Looking for a narrated audiobook…');
   document.getElementById('rlist').innerHTML = '';
-  selResult = null;
+  document.getElementById('uploadZone').style.display = 'none';
+  document.getElementById('srcAttr').style.display = 'none';
+  document.getElementById('addBtn').style.display = '';
   document.getElementById('addBtn').disabled = true;
+  selResult = null;
+  hideFbox();
+
+  // Stage 1 — LibriVox
   try {
     const r = await fetch(`/api/search?q=${encodeURIComponent(q)}`);
     const books = (await r.json()).books || [];
-    if (!books.length) {
-      document.getElementById('astat').textContent = 'No results. Try a different title or author.';
-    } else {
-      document.getElementById('astat').textContent = `Found ${books.length} audiobook${books.length>1?'s':''} — pick one`;
-      renderResults(books);
+    if (books.length) {
+      setStatus(`Found ${books.length} audiobook${books.length > 1 ? 's' : ''} — pick one to add`);
+      renderResults(books.map(b => ({
+        ...b,
+        _type: 'librivox',
+        _da: (b.authors||[]).map(a => `${a.first_name} ${a.last_name}`.trim()).join(', ') || 'Unknown',
+        _meta: `${b.num_sections||'?'} chapters · ${b.totaltime||''}`,
+        _tag: '🎧 Narrated',
+      })));
+      document.getElementById('goBtn').disabled = false;
+      return;
     }
   } catch (e) {
-    document.getElementById('astat').textContent = 'Search failed — is the server running?';
+    setStatus('Something went wrong. Try searching again.');
+    document.getElementById('goBtn').disabled = false;
+    return;
   }
+
+  // Stage 2 — Text sources
+  setStatus('<span class="spin">⟳</span> No audiobook found. Checking for a free text version…');
+  try {
+    const r = await fetch(`/api/search-text?q=${encodeURIComponent(q)}`);
+    const results = (await r.json()).results || [];
+    if (results.length) {
+      setStatus(`Found ${results.length} text source${results.length > 1 ? 's' : ''} — pick one to add`);
+      renderResults(results.map(r => ({
+        ...r,
+        _type: 'scraped',
+        _da: r.author || '',
+        _meta: r.origin,
+        _tag: '📄 Text · read aloud',
+      })));
+      document.getElementById('srcAttr').style.display = '';
+      document.getElementById('goBtn').disabled = false;
+      return;
+    }
+  } catch (e) { /* fall through to Stage 3 */ }
+
+  // Stage 3 — Upload fallback
+  setStatus('No free copy found anywhere.');
+  document.getElementById('uploadZone').style.display = '';
+  document.getElementById('addBtn').style.display = 'none';
   document.getElementById('goBtn').disabled = false;
 }
 
-function renderResults(books) {
+function renderResults(items) {
   const l = document.getElementById('rlist'); l.innerHTML = '';
-  books.forEach((b, i) => {
-    const author = (b.authors||[]).map(a => `${a.first_name} ${a.last_name}`.trim()).join(', ') || 'Unknown';
+  items.forEach((item, i) => {
     const d = document.createElement('div'); d.className = 'ritem';
     d.innerHTML = `<div class="riem">${EMOJIS[i % EMOJIS.length]}</div>
       <div class="rinfo">
-        <div class="rit">${esc(b.title)}</div>
-        <div class="rim">${esc(author)}</div>
-        <span class="rsrc">LibriVox · ${b.num_sections||'?'} ch · ${b.totaltime||''}</span>
+        <div class="rit">${esc(item.title)}</div>
+        <div class="rim">${esc(item._da || '')}</div>
+        <span class="rsrc">${esc(item._tag)} · ${esc(item._meta)}</span>
       </div><div class="rcheck">✓</div>`;
     d.onclick = () => {
       document.querySelectorAll('.ritem').forEach(x => x.classList.remove('sel'));
-      d.classList.add('sel'); selResult = b;
+      d.classList.add('sel'); selResult = item;
       document.getElementById('addBtn').disabled = false;
     };
     l.appendChild(d);
@@ -315,19 +434,23 @@ function renderResults(books) {
 
 async function addSelected() {
   if (!selResult) return;
+  if (selResult._type === 'librivox') await addLibrivoxBook();
+  else await addScrapedBook();
+}
+
+async function addLibrivoxBook() {
   document.getElementById('addBtn').disabled = true;
-  document.getElementById('fbox').style.display = 'block';
-  document.getElementById('astat').textContent = '';
+  setFbox('Loading chapter list…');
   try {
     const r = await fetch(`/api/chapters/${selResult.id}`);
     const sections = (await r.json()).sections || [];
     if (!sections.length) throw new Error('No chapters found');
-    const author = (selResult.authors||[]).map(a => `${a.first_name} ${a.last_name}`.trim()).join(', ') || 'Unknown';
     library.unshift({
       id: 'b' + Date.now(),
+      source: 'librivox',
       librivox_id: selResult.id,
       title: selResult.title,
-      author,
+      author: selResult._da || '',
       totaltime: selResult.totaltime || '',
       chapters: sections.map(s => ({
         title: s.title || `Chapter ${s.section_number}`,
@@ -335,6 +458,7 @@ async function addSelected() {
         duration: s.playtime || s.duration || '',
         durationSecs: parseDuration(s.playtime || s.duration),
       })),
+      progress: { chapterIdx: 0, time: 0 },
       currentChapter: 0,
       currentTime: 0,
       coverEmoji: rand(EMOJIS),
@@ -345,33 +469,126 @@ async function addSelected() {
     closeModal();
     renderLibrary();
   } catch (e) {
-    document.getElementById('astat').textContent = `Failed: ${e.message}`;
+    setStatus(`Failed: ${e.message}`);
     document.getElementById('addBtn').disabled = false;
   }
-  document.getElementById('fbox').style.display = 'none';
+  hideFbox();
+}
+
+async function addScrapedBook() {
+  document.getElementById('addBtn').disabled = true;
+  setFbox('Fetching text…');
+  try {
+    const r = await fetch('/api/fetch-text', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url: selResult.url, format: selResult.format }),
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    if (!d.text || d.text.length < 200) throw new Error('Text too short or empty');
+    library.unshift({
+      id: 'b' + Date.now(),
+      source: 'scraped',
+      origin: selResult.origin,
+      title: selResult.title,
+      author: selResult.author || '',
+      text: d.text,
+      wordCount: d.wordCount,
+      progress: { wordIdx: 0 },
+      coverEmoji: rand(EMOJIS),
+      coverBg: rand(COVERS),
+      addedAt: Date.now(),
+    });
+    await saveLibraryRemote();
+    closeModal();
+    renderLibrary();
+  } catch (e) {
+    setStatus(`Failed: ${e.message}. Try another source.`);
+    document.getElementById('addBtn').disabled = false;
+  }
+  hideFbox();
+}
+
+async function handleUpload(file) {
+  if (!file) return;
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (!['pdf', 'epub', 'txt'].includes(ext)) {
+    setStatus("Couldn't read that file. Try PDF, EPUB, or TXT.");
+    return;
+  }
+  setFbox('Reading your file…');
+  document.getElementById('uploadZone').style.pointerEvents = 'none';
+  try {
+    const fd = new FormData();
+    fd.append('file', file);
+    const r = await fetch('/api/extract-upload', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    library.unshift({
+      id: 'b' + Date.now(),
+      source: 'upload',
+      title: d.suggestedTitle || file.name.replace(/\.[^.]+$/, ''),
+      author: '',
+      text: d.text,
+      wordCount: d.wordCount,
+      progress: { wordIdx: 0 },
+      coverEmoji: rand(EMOJIS),
+      coverBg: rand(COVERS),
+      addedAt: Date.now(),
+    });
+    await saveLibraryRemote();
+    closeModal();
+    renderLibrary();
+  } catch (e) {
+    setStatus("Couldn't read that file. Try a different format, or a different copy.");
+    document.getElementById('uploadZone').style.pointerEvents = '';
+  }
+  hideFbox();
 }
 
 // ── Library render ────────────────────────────────────────────────────────────
 function renderLibrary() {
   const grid = document.getElementById('grid'); grid.innerHTML = '';
   if (!library.length) {
-    grid.innerHTML = `<div class="empty"><div class="empty-icon">🎧</div>
-      <div class="empty-title">Library is empty</div>
-      <div class="empty-sub">Tap <strong>＋ Find book</strong> to search<br>LibriVox for free audiobooks</div>
-      <div class="empty-tip">🎙️ Thousands of public domain classics,<br>read by volunteers worldwide.</div></div>`;
+    grid.innerHTML = `<div class="empty">
+      <div class="empty-icon">🎧</div>
+      <div class="empty-title">Your library is empty</div>
+      <div class="empty-sub">Find any book — classics get real narration,<br>everything else gets read aloud.</div>
+      <div class="empty-tip">Tap <strong>Find a book</strong> to search for anything.</div>
+    </div>`;
     return;
   }
   library.forEach(b => {
-    const ch = b.currentChapter || 0, total = b.chapters ? b.chapters.length : 0;
-    const pct = total ? Math.round((ch / total) * 100) : 0;
+    const isLibrivox = !b.source || b.source === 'librivox';
     const isPlaying = curBook && curBook.id === b.id;
+    let pct = 0, progressLabel = '';
+    if (isLibrivox) {
+      const ch = b.progress?.chapterIdx ?? b.currentChapter ?? 0;
+      const total = b.chapters ? b.chapters.length : 0;
+      pct = total ? Math.round((ch / total) * 100) : 0;
+      if (ch > 0 && total > 0) progressLabel = `Ch. ${ch+1}/${total}`;
+    } else {
+      const wi = b.progress?.wordIdx || 0;
+      const wc = b.wordCount || 0;
+      pct = wc ? Math.round((wi / wc) * 100) : 0;
+      if (wi > 0) progressLabel = `${pct}% read`;
+    }
+    const sourceIcon = b.source === 'scraped' ? '📄' : b.source === 'upload' ? '📤' : '🎧';
+    const metaLine = isLibrivox
+      ? `${b.chapters?.length || 0} chapters${b.totaltime ? ' · '+b.totaltime : ''}`
+      : `${(b.wordCount||0).toLocaleString()} words`;
     const c = document.createElement('div'); c.className = 'card';
-    c.innerHTML = `<div class="cover" style="background:${b.coverBg||'#E1F5EE'}">${isPlaying?'🔊':b.coverEmoji||'📖'}<div class="cpb"><div class="cpf" style="width:${pct}%"></div></div></div>
+    c.innerHTML = `<div class="cover" style="background:${b.coverBg||'#E1F5EE'}">
+        ${isPlaying ? '🔊' : b.coverEmoji||'📖'}
+        <span class="stag">${sourceIcon}</span>
+        <div class="cpb"><div class="cpf" style="width:${pct}%"></div></div>
+      </div>
       <div class="cinfo">
         <div class="ctitle">${esc(b.title)}</div>
         <div class="cmeta">${esc(b.author||'')}</div>
-        <div class="cmeta">${total} chapters${b.totaltime?' · '+b.totaltime:''}</div>
-        ${ch > 0 ? `<div class="cpct">Ch. ${ch+1}/${total}</div>` : ''}
+        <div class="cmeta">${esc(metaLine)}</div>
+        ${progressLabel ? `<div class="cpct">${esc(progressLabel)}</div>` : ''}
       </div>
       <div class="cbtns">
         <button class="cbtn" onclick="openBook('${b.id}')">▶ Play</button>
@@ -381,26 +598,38 @@ function renderLibrary() {
   });
 }
 
-// ── Player ────────────────────────────────────────────────────────────────────
+// ── Player — open book ────────────────────────────────────────────────────────
 function openBook(id) {
   const b = library.find(x => x.id === id); if (!b) return;
   audio.pause();
+  stopTts();
   curBook = b;
-  curChapter = b.currentChapter || 0;
   document.getElementById('ptit').textContent = b.title;
   document.getElementById('noBook').style.display = 'none';
-  document.getElementById('chapters').style.display = '';
-  document.getElementById('playbar').style.display = '';
-  renderChapters();
-  loadChapter(curChapter, b.currentTime || 0, false);
+  const isText = b.source === 'scraped' || b.source === 'upload';
+  document.getElementById('audioView').classList.toggle('on', !isText);
+  document.getElementById('ttsView').classList.toggle('on', isText);
+  if (isText) {
+    ttsCidx = b.progress?.wordIdx || 0;
+    buildTtsWords(b.text || '');
+    ttsJmp(ttsCidx, false);
+    loadTtsVoices();
+    document.getElementById('pch').textContent = `${ttsCidx.toLocaleString()} of ${(b.wordCount||ttsWords.length).toLocaleString()} words`;
+  } else {
+    curChapter = b.progress?.chapterIdx ?? b.currentChapter ?? 0;
+    const seekTime = b.progress?.time ?? b.currentTime ?? 0;
+    renderChapters();
+    loadChapter(curChapter, seekTime, false);
+  }
   sv('player');
 }
 
+// ── Audio player ──────────────────────────────────────────────────────────────
 function loadChapter(idx, seekTo, autoplay) {
   curChapter = idx;
   const ch = curBook.chapters[idx];
   audio.src = ch.url;
-  document.getElementById('tottime').textContent = ch.duration || '0:00';
+  document.getElementById('tottime').textContent = ch.durationSecs ? fmtTime(ch.durationSecs) : '0:00';
   document.getElementById('seekf').style.width = '0%';
   document.getElementById('curtime').textContent = '0:00';
   if (seekTo > 0) curBook._seekOnLoad = seekTo;
@@ -454,10 +683,9 @@ function togglePlay() {
 
 function prevChapter() { if (curChapter > 0) { loadChapter(curChapter-1, 0, !audio.paused); renderChapters(); } }
 function nextChapter() { if (curBook && curChapter < curBook.chapters.length-1) { loadChapter(curChapter+1, 0, true); renderChapters(); } }
-
 function skip(secs) { audio.currentTime = Math.max(0, audio.currentTime + secs); }
 
-function cycleSpeed() {
+function cycleAudioSpeed() {
   speedIdx = (speedIdx + 1) % SPEEDS.length;
   audio.playbackRate = SPEEDS[speedIdx];
   document.getElementById('spdbtn').textContent = SPEEDS[speedIdx] + '×';
@@ -468,10 +696,116 @@ function seekClick(e) {
   audio.currentTime = ((e.clientX - r.left) / r.width) * (audio.duration || 0);
 }
 
+// ── TTS player ────────────────────────────────────────────────────────────────
+function buildTtsWords(text) {
+  ttsWords = text.trim().split(/\s+/).filter(w => w.length);
+  const d = document.getElementById('td'); d.innerHTML = '';
+  ttsWordEls = [];
+  const f = document.createDocumentFragment();
+  ttsWords.forEach((w, i) => {
+    const s = document.createElement('span');
+    s.className = 'word';
+    s.textContent = w;
+    s.onclick = () => { if (ttsPlaying) { stopTts(); ttsJmp(i, true); startTts(); } else ttsJmp(i, true); };
+    ttsWordEls.push(s);
+    f.appendChild(s);
+    f.appendChild(document.createTextNode(' '));
+  });
+  d.appendChild(f);
+}
+
+function startTts() {
+  if (!ttsWords.length) return;
+  synth.cancel();
+  ttsPlaying = true;
+  document.getElementById('ttsIco').textContent = '⏸️';
+  const startIdx = ttsCidx;
+  const chunk = ttsWords.slice(startIdx).join(' ');
+  const utt = new SpeechSynthesisUtterance(chunk);
+  const vi = parseInt(document.getElementById('vsel').value || '0', 10);
+  if (ttsVoices[vi]) utt.voice = ttsVoices[vi];
+  utt.rate = parseFloat(document.getElementById('ttsSpd').value);
+  let lastIdx = startIdx;
+  utt.onboundary = e => {
+    if (e.name !== 'word') return;
+    const ni = startIdx + chunk.substring(0, e.charIndex).split(/\s+/).length - 1;
+    if (ni !== lastIdx) { if (ttsWordEls[lastIdx]) ttsWordEls[lastIdx].className = 'word spoken'; lastIdx = ni; }
+    if (ttsWordEls[lastIdx]) { ttsWordEls[lastIdx].className = 'word active'; ttsWordEls[lastIdx].scrollIntoView({ block: 'center', behavior: 'smooth' }); }
+    ttsCidx = lastIdx;
+    updateTtsNav();
+    if (!ttsSaveTimer) ttsSaveTimer = setTimeout(() => { ttsPersist(); ttsSaveTimer = null; }, 15000);
+  };
+  utt.onend = () => { ttsPlaying = false; document.getElementById('ttsIco').textContent = '▶️'; ttsPersist(); };
+  utt.onerror = () => { ttsPlaying = false; document.getElementById('ttsIco').textContent = '▶️'; };
+  synth.speak(utt);
+}
+
+function stopTts() {
+  synth.cancel();
+  ttsPlaying = false;
+  const ico = document.getElementById('ttsIco');
+  if (ico) ico.textContent = '▶️';
+}
+
+function ttsJmp(i, scroll = false) {
+  ttsCidx = Math.max(0, Math.min(i, ttsWordEls.length - 1));
+  ttsWordEls.forEach((el, idx) => { el.className = 'word' + (idx < ttsCidx ? ' spoken' : ''); });
+  updateTtsNav();
+  if (scroll && ttsWordEls[ttsCidx]) ttsWordEls[ttsCidx].scrollIntoView({ block: 'center', behavior: 'smooth' });
+}
+
+function toggleTts() {
+  if (!curBook) { sv('library'); return; }
+  if (ttsPlaying) { stopTts(); ttsPersist(); } else startTts();
+}
+
+function ttsSkip(n) {
+  ttsJmp(ttsCidx + n, true);
+  if (ttsPlaying) { stopTts(); startTts(); }
+}
+
+function updateTtsNav() {
+  document.getElementById('pch').textContent =
+    `${ttsCidx.toLocaleString()} of ${ttsWords.length.toLocaleString()} words`;
+}
+
+function ttsPersist() {
+  if (!curBook) return;
+  const b = library.find(x => x.id === curBook.id);
+  if (b) { b.progress = b.progress || {}; b.progress.wordIdx = ttsCidx; }
+  saveLibraryRemote();
+}
+
+function loadTtsVoices() {
+  ttsVoices = synth.getVoices();
+  const sel = document.getElementById('vsel');
+  const prev = sel.value;
+  sel.innerHTML = '';
+  ttsVoices.forEach((v, i) => {
+    const o = document.createElement('option');
+    o.value = i; o.textContent = v.name + (v.lang ? ' (' + v.lang + ')' : '');
+    if (v.default) o.selected = true;
+    sel.appendChild(o);
+  });
+  if (prev) sel.value = prev;
+  if (!ttsVoices.length) setTimeout(loadTtsVoices, 200);
+}
+
+function onTtsVoice() { if (ttsPlaying) { stopTts(); startTts(); } }
+function onTtsSpd() {
+  document.getElementById('ttsSpdV').textContent =
+    parseFloat(document.getElementById('ttsSpd').value).toFixed(1) + '×';
+  if (ttsPlaying) { stopTts(); startTts(); }
+}
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+  speechSynthesis.onvoiceschanged = () => { if (curBook && (curBook.source === 'scraped' || curBook.source === 'upload')) loadTtsVoices(); };
+}
+
+// ── Shared controls ───────────────────────────────────────────────────────────
 function delBook(e, id) {
   e.stopPropagation();
   if (!confirm('Remove this book?')) return;
-  if (curBook && curBook.id === id) { audio.pause(); curBook = null; }
+  if (curBook && curBook.id === id) { audio.pause(); stopTts(); curBook = null; }
   library = library.filter(b => b.id !== id);
   saveLibraryRemote();
   renderLibrary();
@@ -483,11 +817,11 @@ function sv(v) {
   document.getElementById('vPlayer').classList.toggle('on', isPlayer);
   document.getElementById('tLib').classList.toggle('on', !isPlayer);
   document.getElementById('tPlayer').classList.toggle('on', isPlayer);
-  if (!isPlayer) { renderLibrary(); }
+  if (!isPlayer) renderLibrary();
   if (isPlayer && !curBook) {
     document.getElementById('noBook').style.display = '';
-    document.getElementById('chapters').style.display = 'none';
-    document.getElementById('playbar').style.display = 'none';
+    document.getElementById('audioView').classList.remove('on');
+    document.getElementById('ttsView').classList.remove('on');
     document.getElementById('ptit').textContent = 'No book open';
     document.getElementById('pch').textContent = '';
   }
@@ -499,7 +833,11 @@ function openModal() {
   document.getElementById('astat').textContent = '';
   document.getElementById('rlist').innerHTML = '';
   document.getElementById('fbox').style.display = 'none';
+  document.getElementById('uploadZone').style.display = 'none';
+  document.getElementById('uploadZone').style.pointerEvents = '';
+  document.getElementById('srcAttr').style.display = 'none';
   document.getElementById('addBtn').disabled = true;
+  document.getElementById('addBtn').style.display = '';
   document.getElementById('goBtn').disabled = false;
   selResult = null;
   setTimeout(() => document.getElementById('qi').focus(), 200);
