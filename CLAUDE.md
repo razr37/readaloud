@@ -68,6 +68,10 @@ Stores the entire library as `readaloud_library.json`. Auth priority:
 
 If neither is configured, the server starts but `/api/library` errors. `libraryFileId` is cached in memory after first lookup — if the Drive file is deleted while the server runs, saves will 404 silently until restart. **Do not modify this file.**
 
+**`invalid_grant` / empty library symptom**: if `GET /api/library` returns `{"library":[]}` or `POST` returns `{"error":"invalid_grant"}`, the refresh token has expired or been revoked. Regenerate it via the OAuth playground flow (see PROJECT_STATUS.md) and update `GOOGLE_REFRESH_TOKEN` in the Render dashboard, then redeploy.
+
+**Known gotcha — OAuth client must be in Production mode**: while in "Testing" mode, Google caps refresh tokens at 7 days regardless of usage. This has already caused one outage. The OAuth client has been published to Production (Google Cloud Console → APIs & Services → Google Auth Platform → Audience). Because the app only uses `drive.file` scope, publishing does not require Google's verification review. If `invalid_grant` recurs without an obvious revocation reason, check that the client hasn't been rolled back to Testing mode.
+
 ### Tests (`src/__tests__/server.test.js`)
 
 `jest.mock('../driveSync', ...)` prevents real Drive calls. `axios-mock-adapter` intercepts all outbound HTTP. Each test calls `mock.reset()` in `afterEach`. File upload tests use supertest's `.attach()` with a `Buffer`.
