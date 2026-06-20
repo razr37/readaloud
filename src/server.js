@@ -247,7 +247,17 @@ async function extractEpub(buffer) {
 async function extractPdf(buffer) {
   const pdfParse = require('pdf-parse');
   const data = await pdfParse(buffer);
-  const text = data.text.replace(/\f/g, '\n\n').trim();
+  // Drop lines with no run of 3+ letters — removes page-number lines, decoration lines
+  // (e.g. repeated "!" separators), and garbled lines from non-standard font encodings.
+  const text = data.text
+    .replace(/\f/g, '\n')
+    .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, ' ')
+    .split('\n')
+    .filter(line => /[a-zA-ZÀ-ɏ]{3,}/.test(line))
+    .join('\n')
+    .replace(/[^\S\n]+/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim();
   return { text, wordCount: text.split(/\s+/).filter(w => w.length).length };
 }
 

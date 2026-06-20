@@ -716,7 +716,10 @@ function buildTtsWords(text) {
 
 function startTts() {
   if (!ttsWords.length) return;
+  if (!ttsVoices.length) loadTtsVoices();
   synth.cancel();
+  // Chrome leaves the engine in a paused state after cancel(); resume() unsticks it.
+  if (synth.paused) synth.resume();
   ttsPlaying = true;
   document.getElementById('ttsIco').textContent = '⏸️';
   const startIdx = ttsCidx;
@@ -736,7 +739,7 @@ function startTts() {
     if (!ttsSaveTimer) ttsSaveTimer = setTimeout(() => { ttsPersist(); ttsSaveTimer = null; }, 15000);
   };
   utt.onend = () => { ttsPlaying = false; document.getElementById('ttsIco').textContent = '▶️'; ttsPersist(); };
-  utt.onerror = () => { ttsPlaying = false; document.getElementById('ttsIco').textContent = '▶️'; };
+  utt.onerror = e => { console.error('[TTS error]', e.error, e); ttsPlaying = false; document.getElementById('ttsIco').textContent = '▶️'; };
   synth.speak(utt);
 }
 
@@ -797,8 +800,12 @@ function onTtsSpd() {
     parseFloat(document.getElementById('ttsSpd').value).toFixed(1) + '×';
   if (ttsPlaying) { stopTts(); startTts(); }
 }
-if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
-  speechSynthesis.onvoiceschanged = () => { if (curBook && (curBook.source === 'scraped' || curBook.source === 'upload')) loadTtsVoices(); };
+// Load voices eagerly so they are ready before the user first taps play.
+if (typeof speechSynthesis !== 'undefined') {
+  if (speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = loadTtsVoices;
+  }
+  loadTtsVoices();
 }
 
 // ── Shared controls ───────────────────────────────────────────────────────────
