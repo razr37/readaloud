@@ -30,24 +30,40 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .view.on{display:flex}
 
 /* ── Library ── */
-.lhead{padding:16px 16px 8px;display:flex;align-items:center;justify-content:space-between}
-.ltitle{font-size:19px;font-weight:700}
+.lhead{padding:12px 14px 8px;display:flex;align-items:center;gap:8px}
+.ltitle{font-size:19px;font-weight:700;margin-right:auto}
 .find-btn{display:flex;align-items:center;gap:5px;padding:9px 16px;background:var(--g);color:#fff;border:none;border-radius:9px;font-size:14px;cursor:pointer;font-family:inherit;font-weight:500}
-.grid{padding:4px 14px 24px;display:grid;grid-template-columns:repeat(auto-fill,minmax(145px,1fr));gap:11px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
-.card{border:0.5px solid var(--b);border-radius:13px;overflow:hidden;background:var(--card);cursor:pointer;transition:transform .1s}
+.view-tog{padding:7px 10px;border:0.5px solid var(--b);border-radius:8px;background:transparent;cursor:pointer;font-size:13px;font-family:inherit;color:var(--ts);flex-shrink:0}
+.grid{padding:4px 10px 20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:8px;overflow-y:auto;-webkit-overflow-scrolling:touch;flex:1}
+.card{border:0.5px solid var(--b);border-radius:12px;overflow:hidden;background:var(--card);cursor:pointer;transition:transform .1s}
 .card:active{transform:scale(.97)}
-.cover{height:95px;display:flex;align-items:center;justify-content:center;font-size:38px;position:relative}
-.stag{position:absolute;top:6px;left:6px;font-size:11px;line-height:1;padding:2px 5px;border-radius:5px;background:rgba(0,0,0,.35);color:#fff}
+.cover{height:80px;display:flex;align-items:center;justify-content:center;font-size:32px;position:relative}
+.stag{position:absolute;top:5px;left:5px;font-size:10px;line-height:1;padding:2px 4px;border-radius:4px;background:rgba(0,0,0,.35);color:#fff}
 .cpb{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(0,0,0,.07)}
 .cpf{height:100%;background:var(--g)}
-.cinfo{padding:9px 10px 4px}
-.ctitle{font-size:13px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.cmeta{font-size:11px;color:var(--tt);margin-top:2px}
-.cpct{font-size:11px;color:var(--gd);font-weight:600;margin-top:2px}
-.cbtns{display:flex;border-top:0.5px solid var(--b);margin-top:7px}
-.cbtn{flex:1;padding:8px 4px;border:none;background:transparent;cursor:pointer;font-size:13px;color:var(--ts);font-family:inherit}
+.cinfo{padding:7px 9px 3px}
+.ctitle{font-size:12px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cmeta{font-size:10px;color:var(--tt);margin-top:2px}
+.cpct{font-size:10px;color:var(--gd);font-weight:600;margin-top:2px}
+.cbtns{display:flex;border-top:0.5px solid var(--b);margin-top:5px}
+.cbtn{flex:1;padding:6px 4px;border:none;background:transparent;cursor:pointer;font-size:12px;color:var(--ts);font-family:inherit}
 .cbtn.del{color:#e03}
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4rem 2rem;gap:14px;text-align:center;grid-column:1/-1}
+/* ── List view ── */
+.lview{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.litem{display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:0.5px solid var(--b);cursor:pointer;transition:background .1s}
+.litem:active{background:var(--bg)}
+.lthumb{width:46px;height:46px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;position:relative}
+.linfo{flex:1;min-width:0}
+.ltit{font-size:14px;font-weight:600;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lmeta{font-size:11px;color:var(--tt);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lpct{font-size:11px;color:var(--gd);font-weight:600;margin-top:2px}
+.lpb{height:2px;background:var(--b);border-radius:1px;margin-top:5px}
+.lpbf{height:100%;background:var(--g);border-radius:1px}
+.lbtns{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.lbtn{width:34px;height:34px;border-radius:50%;border:0.5px solid var(--b);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;font-family:inherit;color:var(--ts)}
+.lbtn.play{background:var(--g);border-color:var(--g);color:#fff}
+.lbtn.del{color:#e03;border-color:transparent}
 .empty-icon{font-size:52px}
 .empty-title{font-size:16px;font-weight:600}
 .empty-sub{font-size:13px;color:var(--ts);line-height:1.7}
@@ -155,6 +171,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
   <div class="view on" id="vLib">
     <div class="lhead">
       <div class="ltitle">My Library</div>
+      <button class="view-tog" id="viewTog" onclick="toggleViewMode()">☰ List</button>
       <button class="find-btn" onclick="openModal()">＋ Find a book</button>
     </div>
     <div class="grid" id="grid"></div>
@@ -274,6 +291,7 @@ function parseDuration(str) {
 
 // ── State ─────────────────────────────────────────────────────────────────────
 let library = [], curBook = null, curChapter = 0, selResult = null, audioSaveTimer = null;
+let viewMode = localStorage.getItem('readaloud_view_mode') || 'grid';
 const SPEEDS = [0.75, 1, 1.25, 1.5, 1.75, 2];
 let speedIdx = 1;
 const audio = new Audio();
@@ -548,10 +566,26 @@ async function handleUpload(file) {
 }
 
 // ── Library render ────────────────────────────────────────────────────────────
+function toggleViewMode() {
+  viewMode = viewMode === 'grid' ? 'list' : 'grid';
+  localStorage.setItem('readaloud_view_mode', viewMode);
+  renderLibrary();
+}
+
 function renderLibrary() {
-  const grid = document.getElementById('grid'); grid.innerHTML = '';
+  const el = document.getElementById('grid');
+  el.innerHTML = '';
+  // Sync toggle button label and container class
+  const tog = document.getElementById('viewTog');
+  if (viewMode === 'list') {
+    el.className = 'lview';
+    if (tog) tog.textContent = '⊞ Grid';
+  } else {
+    el.className = 'grid';
+    if (tog) tog.textContent = '☰ List';
+  }
   if (!library.length) {
-    grid.innerHTML = `<div class="empty">
+    el.innerHTML = `<div class="empty">
       <div class="empty-icon">🎧</div>
       <div class="empty-title">Your library is empty</div>
       <div class="empty-sub">Find any book — classics get real narration,<br>everything else gets read aloud.</div>
@@ -578,23 +612,44 @@ function renderLibrary() {
     const metaLine = isLibrivox
       ? `${b.chapters?.length || 0} chapters${b.totaltime ? ' · '+b.totaltime : ''}`
       : `${(b.wordCount||0).toLocaleString()} words`;
-    const c = document.createElement('div'); c.className = 'card';
-    c.innerHTML = `<div class="cover" style="background:${b.coverBg||'#E1F5EE'}">
-        ${isPlaying ? '🔊' : b.coverEmoji||'📖'}
-        <span class="stag">${sourceIcon}</span>
-        <div class="cpb"><div class="cpf" style="width:${pct}%"></div></div>
-      </div>
-      <div class="cinfo">
-        <div class="ctitle">${esc(b.title)}</div>
-        <div class="cmeta">${esc(b.author||'')}</div>
-        <div class="cmeta">${esc(metaLine)}</div>
-        ${progressLabel ? `<div class="cpct">${esc(progressLabel)}</div>` : ''}
-      </div>
-      <div class="cbtns">
-        <button class="cbtn" onclick="openBook('${b.id}')">▶ Play</button>
-        <button class="cbtn del" onclick="delBook(event,'${b.id}')">🗑</button>
-      </div>`;
-    grid.appendChild(c);
+
+    if (viewMode === 'list') {
+      const row = document.createElement('div'); row.className = 'litem';
+      row.onclick = () => openBook(b.id);
+      row.innerHTML = `<div class="lthumb" style="background:${b.coverBg||'#E1F5EE'}">
+          ${isPlaying ? '🔊' : b.coverEmoji||'📖'}
+          <span class="stag">${sourceIcon}</span>
+        </div>
+        <div class="linfo">
+          <div class="ltit">${esc(b.title)}</div>
+          <div class="lmeta">${esc((b.author ? b.author+' · ' : '')+metaLine)}</div>
+          ${progressLabel ? `<div class="lpct">${esc(progressLabel)}</div>` : ''}
+          ${pct > 0 ? `<div class="lpb"><div class="lpbf" style="width:${pct}%"></div></div>` : ''}
+        </div>
+        <div class="lbtns">
+          <button class="lbtn play" onclick="event.stopPropagation();openBook('${b.id}')">▶</button>
+          <button class="lbtn del" onclick="delBook(event,'${b.id}')">🗑</button>
+        </div>`;
+      el.appendChild(row);
+    } else {
+      const c = document.createElement('div'); c.className = 'card';
+      c.innerHTML = `<div class="cover" style="background:${b.coverBg||'#E1F5EE'}">
+          ${isPlaying ? '🔊' : b.coverEmoji||'📖'}
+          <span class="stag">${sourceIcon}</span>
+          <div class="cpb"><div class="cpf" style="width:${pct}%"></div></div>
+        </div>
+        <div class="cinfo">
+          <div class="ctitle">${esc(b.title)}</div>
+          <div class="cmeta">${esc(b.author||'')}</div>
+          <div class="cmeta">${esc(metaLine)}</div>
+          ${progressLabel ? `<div class="cpct">${esc(progressLabel)}</div>` : ''}
+        </div>
+        <div class="cbtns">
+          <button class="cbtn" onclick="openBook('${b.id}')">▶ Play</button>
+          <button class="cbtn del" onclick="delBook(event,'${b.id}')">🗑</button>
+        </div>`;
+      el.appendChild(c);
+    }
   });
 }
 
