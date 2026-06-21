@@ -777,30 +777,51 @@ function startTts() {
   if (synth.paused) synth.resume();
   ttsPlaying = true;
   document.getElementById('ttsIco').textContent = '⏸️';
-  const startIdx = ttsCidx;
-  const chunk = ttsWords.slice(startIdx).join(' ');
+  speakChunked(ttsCidx);
+}
+
+function speakChunked(fromIdx) {
+  if (!ttsPlaying || fromIdx >= ttsWords.length) {
+    if (ttsPlaying) { ttsPlaying = false; document.getElementById('ttsIco').textContent = '▶️'; ttsPersist(); }
+    return;
+  }
+  const CHUNK = 200;
+  let endIdx = Math.min(fromIdx + CHUNK, ttsWords.length);
+  // Try to break at a sentence boundary within the last 40 words of the chunk
+  if (endIdx < ttsWords.length) {
+    for (let i = endIdx - 1; i >= Math.max(fromIdx + CHUNK - 40, fromIdx); i--) {
+      if (/[.!?]$/.test(ttsWords[i])) { endIdx = i + 1; break; }
+    }
+  }
+  const chunk = ttsWords.slice(fromIdx, endIdx).join(' ');
   const utt = new SpeechSynthesisUtterance(chunk);
   const vi = parseInt(document.getElementById('vsel').value || '0', 10);
   if (ttsVoices[vi]) utt.voice = ttsVoices[vi];
   utt.rate = parseFloat(document.getElementById('ttsSpd').value);
-  let lastIdx = startIdx;
+  let lastIdx = fromIdx;
   utt.onboundary = e => {
     if (e.name !== 'word') return;
-    const ni = startIdx + chunk.substring(0, e.charIndex).split(/\s+/).length - 1;
+    const ni = fromIdx + chunk.substring(0, e.charIndex).split(/\s+/).length - 1;
     if (ni !== lastIdx) { if (ttsWordEls[lastIdx]) ttsWordEls[lastIdx].className = 'word spoken'; lastIdx = ni; }
     if (ttsWordEls[lastIdx]) { ttsWordEls[lastIdx].className = 'word active'; ttsWordEls[lastIdx].scrollIntoView({ block: 'center', behavior: 'smooth' }); }
     ttsCidx = lastIdx;
     updateTtsNav();
     if (!ttsSaveTimer) ttsSaveTimer = setTimeout(() => { ttsPersist(); ttsSaveTimer = null; }, 15000);
   };
-  utt.onend = () => { ttsPlaying = false; document.getElementById('ttsIco').textContent = '▶️'; ttsPersist(); };
+  utt.onend = () => {
+    if (!ttsPlaying) return;
+    for (let i = lastIdx; i < endIdx && i < ttsWordEls.length; i++) ttsWordEls[i].className = 'word spoken';
+    ttsCidx = endIdx;
+    updateTtsNav();
+    speakChunked(endIdx);
+  };
   utt.onerror = e => { console.error('[TTS error]', e.error, e); ttsPlaying = false; document.getElementById('ttsIco').textContent = '▶️'; };
   synth.speak(utt);
 }
 
 function stopTts() {
-  synth.cancel();
   ttsPlaying = false;
+  synth.cancel();
   const ico = document.getElementById('ttsIco');
   if (ico) ico.textContent = '▶️';
 }
