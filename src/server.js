@@ -19,12 +19,6 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 const LIBRIVOX = 'https://librivox.org/api/feed';
 
-// ── Self-ping to prevent Render free tier spin-down ──────────────────────────
-setInterval(() => {
-  const client = require(SELF_URL.startsWith('https') ? 'https' : 'http');
-  client.get(`${SELF_URL}/ping`, () => {}).on('error', () => {});
-}, 14 * 60 * 1000);
-
 app.get('/ping', (req, res) => res.json({ ok: true, time: new Date().toISOString() }));
 
 // ── LibriVox search (Stage 1) ─────────────────────────────────────────────────
@@ -297,6 +291,6 @@ module.exports = app;
 if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`ReadAloud running on port ${PORT}`);
-    console.log(`Self-ping URL: ${SELF_URL}/ping`);
+    console.log(`Health check: ${SELF_URL}/ping`);
   });
 }
